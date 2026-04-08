@@ -135,6 +135,12 @@ public class WildFlyA2AGrpcTestCase extends AbstractA2AServerTest {
         return ShrinkWrap.createFromZipFile(JavaArchive.class, f);
     }
 
+    @Override
+    public void testAgentCardHeaders() {
+        // Skip - gRPC doesn't use HTTP caching headers for Agent Card
+        // The A2A spec section 8.6 caching requirements apply only to HTTP endpoints
+    }
+
     @AfterAll
     public static void closeChannel() {
         channel.shutdownNow();

@@ -8,6 +8,9 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -153,17 +156,36 @@ public class A2ARestServerResource {
 
     /**
      * Handles incoming GET requests to the agent card endpoint.
-     * Returns the agent card in JSON format.
+     * Returns the agent card in JSON format with appropriate caching headers.
      *
-     * @return the agent card
+     * <p>Per A2A specification section 8.6, Agent Card HTTP endpoints SHOULD include:
+     * <ul>
+     *   <li>Cache-Control header with max-age directive (CARD-CACHE-001)</li>
+     *   <li>ETag header for conditional request support (CARD-CACHE-002)</li>
+     *   <li>Last-Modified header in RFC 1123 format (CARD-CACHE-003)</li>
+     * </ul>
+     *
+     * @return the agent card with caching headers
      */
     @GET
     @Path(".well-known/agent-card.json")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getAgentCard() {
         RestHandler.HTTPRestResponse response = jsonRestHandler.getAgentCard();
+
+        // Generate ETag based on response body content hash
+        String etag = "\"" + Integer.toHexString(response.getBody().hashCode()) + "\"";
+
+        // Set Last-Modified to current time in RFC 1123 format
+        // In production, this should reflect actual last modification time
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("GMT"));
+        String lastModified = now.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
         return Response.status(response.getStatusCode())
                 .header(CONTENT_TYPE, response.getContentType())
+                .header("Cache-Control", "max-age=3600")
+                .header("ETag", etag)
+                .header("Last-Modified", lastModified)
                 .entity(response.getBody())
                 .build();
     }

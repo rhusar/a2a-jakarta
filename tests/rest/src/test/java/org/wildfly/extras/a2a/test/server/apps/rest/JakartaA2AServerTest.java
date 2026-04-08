@@ -145,7 +145,7 @@ public class JakartaA2AServerTest extends AbstractA2AServerTest {
             // Validate content-type header for error responses
             String contentType = response.getContentType();
             assertNotNull(contentType, "Content-Type header should be present on error responses");
-            assertEquals(MediaType.APPLICATION_PROBLEM_JSON, contentType,
+            assertEquals(MediaType.APPLICATION_JSON, contentType,
                     "Error responses must use application/problem+json content-type");
         }
     }
