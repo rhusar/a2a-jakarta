@@ -15,7 +15,7 @@
 
     <packaging>war</packaging>
 
-    <name>WildFly Extras - A2A Jakarta - Example - Simple Server</name>
+    <name>WildFly Extras - A2A Jakarta - Examples - Simple Server</name>
     <description>Java SDK for the Agent2Agent Protocol (A2A) - SDK - Jakarta - Example - Simple</description>
 
     <properties>

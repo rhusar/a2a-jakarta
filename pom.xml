@@ -16,7 +16,7 @@
 
     <packaging>pom</packaging>
 
-    <name>WildFly Extras - A2A Jakarta Parent</name>
+    <name>WildFly Extras - A2A Jakarta - Parent</name>
     <description>A2A Protocol SDK for Jakarta Servers - Parent</description>
 
     <url>https://github.com/wildfly-extras/a2a-jakarta</url>

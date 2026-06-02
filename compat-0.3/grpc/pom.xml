@@ -14,7 +14,7 @@
     <artifactId>a2a-jakarta-compat-0.3-grpc</artifactId>
     <packaging>jar</packaging>
 
-    <name>WildFly Extras - A2A Jakarta v0.3 Compat gRPC</name>
+    <name>WildFly Extras - A2A Jakarta - v0.3 Compat - gRPC</name>
     <description>Java SDK for the Agent2Agent Protocol (A2A) - SDK - Jakarta - v0.3 Compat - gRPC integration</description>
 
     <dependencies>
