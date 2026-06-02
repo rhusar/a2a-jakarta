@@ -14,7 +14,7 @@
 
     <packaging>jar</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - HTTP+JSON/REST Tests</name>
+    <name>WildFly Extras - A2A Jakarta - HTTP+JSON/REST Tests</name>
     <description>Java SDK for the Agent2Agent Protocol (A2A) - SDK - Jakarta - HTTP+JSON/REST Tests</description>
 
     <dependencies>

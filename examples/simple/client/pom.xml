@@ -15,7 +15,7 @@
 
     <packaging>jar</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - Example - Simple Client</name>
+    <name>WildFly Extras - A2A Jakarta - Examples - Simple Client</name>
     <description>Java SDK for the Agent2Agent Protocol (A2A) - SDK - Jakarta - TCK - WildFly Jar</description>
 
     <properties>

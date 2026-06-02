@@ -14,7 +14,7 @@
 
     <packaging>war</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - TCK - WildFly Jar</name>
+    <name>WildFly Extras - A2A Jakarta - TCK - WildFly Jar</name>
     <description>Java SDK for the Agent2Agent Protocol (A2A) - SDK - Jakarta - TCK - WildFly Jar</description>
 
     <dependencies>
