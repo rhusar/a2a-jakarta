@@ -30,8 +30,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>a2a-java-sdk-jakarta-jsonrpc</artifactId>
+            <artifactId>a2a-java-sdk-jakarta-jsonrpc-web</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>a2a-java-sdk-jakarta-common</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

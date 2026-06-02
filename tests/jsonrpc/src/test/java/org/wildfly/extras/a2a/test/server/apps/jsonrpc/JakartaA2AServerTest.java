@@ -36,6 +36,8 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
+import org.wildfly.extras.a2a.server.apps.common.AsyncManagedExecutorServiceProducer;
+import org.wildfly.extras.a2a.server.apps.jsonrpc.A2AServerResource;
 import org.wildfly.extras.a2a.server.apps.jsonrpc.WildFlyJSONRPCTransportMetadata;
 
 import static io.restassured.RestAssured.given;
@@ -94,8 +96,10 @@ public class JakartaA2AServerTest extends AbstractA2AServerTest {
                 getJarForClass(AnnotationsProto.class),
                 // guava.jar (required by a2a-java dependencies)
                 getJarForClass(ImmutableSet.class),
-                // a2a-java-sdk-jakarta-jsonrpc.jar - contains WildFlyJSONRPCTransportMetadata
+                // a2a-java-sdk-jakarta-jsonrpc.jar - contains delegate and WildFlyJSONRPCTransportMetadata
                 getJarForClass(WildFlyJSONRPCTransportMetadata.class),
+                // a2a-java-sdk-jakarta-jsonrpc-web.jar - contains A2AServerResource
+                getJarForClass(A2AServerResource.class),
                 //a2a-java-sdk-microprofile-config.jar (needed to configure a2a-java settings via MP Config)
                 getJarForClass(MicroProfileConfigProvider.class),
                 // mutiny-zero.jar. This is provided by some WildFly layers, but not always, and not in
@@ -106,7 +110,9 @@ public class JakartaA2AServerTest extends AbstractA2AServerTest {
                 // a2a-java-sdk-client-transport-spi.jar (client transport SPI)
                 getJarForClass(ClientTransport.class),
                 // a2a-java-sdk-client-transport-jsonrpc.jar (JSONRPC client transport)
-                getJarForClass(JSONRPCTransportProvider.class)).toArray(new JavaArchive[0]);
+                getJarForClass(JSONRPCTransportProvider.class),
+                // a2a-java-sdk-jakarta-common.jar (ManagedExecutor for RequestScoped bean injection into AgentExecutors)
+                getJarForClass(AsyncManagedExecutorServiceProducer.class)).toArray(new JavaArchive[0]);
 
 
         WebArchive archive = ShrinkWrap.create(WebArchive.class, "ROOT.war")
