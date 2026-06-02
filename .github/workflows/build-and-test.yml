@@ -19,7 +19,14 @@ concurrency:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout sources
         uses: actions/checkout@v6
@@ -31,7 +38,7 @@ jobs:
           cache: maven
       - name: Check if SDK version is SNAPSHOT
         run: |
-          SDK_VERSION=$(grep -oP '<version\.sdk>\K[^<]+' pom.xml)
+          SDK_VERSION=$(sed -n 's/.*<version\.sdk>\(.*\)<\/version\.sdk>.*/\1/p' pom.xml)
           echo "Detected SDK_VERSION: ${SDK_VERSION}"
           echo "SDK_VERSION=${SDK_VERSION}" >> "$GITHUB_ENV"
           if [[ "${SDK_VERSION}" == *"-SNAPSHOT" ]]; then
