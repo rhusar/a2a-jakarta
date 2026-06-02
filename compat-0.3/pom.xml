@@ -14,7 +14,7 @@
 
     <packaging>pom</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - v0.3 Compat - Parent</name>
+    <name>WildFly Extras - A2A Jakarta - v0.3 Compat - Parent</name>
     <description>Jakarta SDK for the Agent2Agent Protocol (A2A) - v0.3 Backward Compatibility - Parent</description>
 
     <modules>

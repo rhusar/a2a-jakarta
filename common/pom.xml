@@ -15,7 +15,7 @@
 
     <packaging>jar</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - Common</name>
+    <name>WildFly Extras - A2A Jakarta - Common</name>
     <description>Jakarta SDK for the Agent2Agent Protocol (A2A) - Common utilities</description>
 
     <dependencies>

@@ -14,7 +14,7 @@
     <artifactId>a2a-jakarta-compat-0.3-multiversion-jsonrpc</artifactId>
     <packaging>jar</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - Multi-Version JSON-RPC</name>
+    <name>WildFly Extras - A2A Jakarta - Multi-Version JSON-RPC</name>
     <description>Jakarta SDK for the Agent2Agent Protocol (A2A) - Multi-Version JSON-RPC Dispatch</description>
 
     <dependencies>

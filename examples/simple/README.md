@@ -1,4 +1,4 @@
-# A2A Java SDK Server Jakarta - Simple Example
+# A2A Jakarta - Simple Example
 This example provides a simple client and server demonstrating the use of the [A2A Java SDK](https://github.com/a2aproject/a2a-java) in a Jakarta server. In this case we are using WildFly.
 
 The example consists of a server, implementing an A2A Agent, as well as a client interacting with the agent. It is a very simple "Hello world" style application, and the focus of this example is on how to package your application for use with the various transports used by the A2A protocol. 

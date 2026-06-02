@@ -14,7 +14,7 @@
 
     <packaging>jar</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - gRPC Tests</name>
+    <name>WildFly Extras - A2A Jakarta - gRPC Tests</name>
     <description>Java SDK for the Agent2Agent Protocol (A2A) - SDK - Jakarta - gRPC Tests</description>
 
     <properties>

@@ -15,7 +15,7 @@
 
     <packaging>jar</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - JSON-RPC Web</name>
+    <name>WildFly Extras - A2A Jakarta - JSON-RPC Web</name>
     <description>Java SDK for the Agent2Agent Protocol (A2A) - SDK - Jakarta - JSON-RPC JAX-RS Resources</description>
 
     <dependencies>

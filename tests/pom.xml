@@ -14,7 +14,7 @@
 
     <packaging>pom</packaging>
 
-    <name>WildFly Extras - Java A2A SDK for Jakarta - Tests - Parent</name>
+    <name>WildFly Extras - A2A Jakarta - Tests - Parent</name>
     <description>Java SDK for the Agent2Agent Protocol (A2A) - SDK - Jakarta - Tests - Parent</description>
 
     <build>
