@@ -275,7 +275,7 @@
                         </feature-pack>
                         <!-- Add gRPC feature pack -->
                         <feature-pack>
-                            <groupId>org.wildfly.extras.grpc</groupId>
+                            <groupId>org.wildfly.grpc</groupId>
                             <artifactId>wildfly-grpc-feature-pack</artifactId>
                             <version>${version.wildfly.grpc}</version>
                         </feature-pack>
