@@ -49,6 +49,7 @@
 
         <version.hamcrest>2.2</version.hamcrest>
         <version.junit>5.12.2</version.junit>
+        <version.mockito>5.12.0</version.mockito>
         <version.org.wildfly.arquillian>5.1.0.Beta11</version.org.wildfly.arquillian>
         <version.org.jboss.arquillian>1.10.0.Final</version.org.jboss.arquillian>
         <version.org.jboss.shrinkwrap.shrinkwrap>1.2.6</version.org.jboss.shrinkwrap.shrinkwrap>
@@ -208,6 +209,12 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
                 <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${version.mockito}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

@@ -1,17 +1,20 @@
 package org.wildfly.a2a.jakarta.common;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class A2AVersionResolver {
 
-    private final Map<String, A2AVersionProvider> providersByVersion = new HashMap<>();
+    private final Map<String, A2AVersionProvider> providersByVersion = new LinkedHashMap<>();
     private A2AVersionProvider defaultProvider;
 
     public A2AVersionResolver(Iterable<A2AVersionProvider> providers) {
         for (A2AVersionProvider provider : providers) {
             providersByVersion.put(provider.getVersion(), provider);
             if (provider.isDefaultVersion()) {
+                if (defaultProvider != null) {
+                    throw new IllegalStateException("Only one default version provider should be defined. We have at least 2: %s and %s".formatted(defaultProvider, provider));
+                }
                 defaultProvider = provider;
             }
         }
@@ -36,6 +39,6 @@ public class A2AVersionResolver {
     }
 
     public String supportedVersionsString() {
-        return providersByVersion.keySet().toString();
+        return String.join(", ", providersByVersion.keySet());
     }
 }
