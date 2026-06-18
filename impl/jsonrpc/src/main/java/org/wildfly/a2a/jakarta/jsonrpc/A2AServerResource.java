@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.SecurityContext;
 
 import org.a2aproject.sdk.transport.jsonrpc.handler.JSONRPCHandler;
 
+// JAX-RS @Path annotations cannot be parameterized, so each protocol version requires a separate resource class.
 @Path("/a2a_jsonrpc_v1.0")
 public class A2AServerResource {
 
@@ -25,6 +26,7 @@ public class A2AServerResource {
 
     private A2AServerResourceDelegate delegate;
 
+    // Per-request JAX-RS resource — no synchronization needed; each request gets a new instance.
     private A2AServerResourceDelegate getDelegate() {
         if (delegate == null) {
             delegate = new A2AServerResourceDelegate(jsonRpcHandler);

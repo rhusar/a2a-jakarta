@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +33,6 @@ import org.slf4j.LoggerFactory;
 public class A2AJsonRpcAcceptFilter implements ContainerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(A2AJsonRpcAcceptFilter.class);
-    private static final String JSONRPC_PREFIX = "/a2a_jsonrpc_";
     private static final Pattern ID_PATTERN = Pattern.compile("\"id\"\\s*:\\s*(\\d+|\"[^\"]*\"|null)");
 
     @Inject
@@ -58,7 +58,7 @@ public class A2AJsonRpcAcceptFilter implements ContainerRequestFilter {
                     }
                     List<A2AVersionProvider> jsonRpcProviders = new ArrayList<>();
                     for (A2AVersionProvider provider : allVersionProviders) {
-                        if (provider.getInternalPathPrefix().startsWith(JSONRPC_PREFIX)) {
+                        if (provider.getInternalPathPrefix().startsWith(InternalPaths.JSONRPC_PREFIX)) {
                             jsonRpcProviders.add(provider);
                         }
                     }
@@ -84,7 +84,7 @@ public class A2AJsonRpcAcceptFilter implements ContainerRequestFilter {
         String requestBody;
         try (InputStream entityInputStream = requestContext.getEntityStream()) {
             byte[] requestBodyBytes = entityInputStream.readAllBytes();
-            requestBody = new String(requestBodyBytes);
+            requestBody = new String(requestBodyBytes, StandardCharsets.UTF_8);
 
             if (isStreamingRequest(requestBody)) {
                 LOGGER.debug("Handling request as streaming: {}", requestBody);
@@ -96,7 +96,7 @@ public class A2AJsonRpcAcceptFilter implements ContainerRequestFilter {
 
             requestContext.setEntityStream(new ByteArrayInputStream(requestBodyBytes));
         } catch (IOException e) {
-            throw new RuntimeException("Unable to read the request body");
+            throw new RuntimeException("Unable to read the request body", e);
         }
 
         String versionHeader = requestContext.getHeaderString(A2AHeaders.A2A_VERSION);
@@ -106,7 +106,7 @@ public class A2AJsonRpcAcceptFilter implements ContainerRequestFilter {
             requestContext.abortWith(
                     Response.status(Response.Status.BAD_REQUEST)
                             .entity("{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32009,\"message\":\"Protocol version '"
-                                    + versionHeader + "' is not supported. Supported versions: "
+                                    + InternalPaths.escapeJsonValue(versionHeader) + "' is not supported. Supported versions: "
                                     + versionResolver.supportedVersionsString() + "\"},\"id\":" + requestId + "}")
                             .type(MediaType.APPLICATION_JSON)
                             .build());

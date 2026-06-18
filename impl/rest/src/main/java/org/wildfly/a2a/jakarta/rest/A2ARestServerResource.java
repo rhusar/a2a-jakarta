@@ -20,6 +20,7 @@ import jakarta.ws.rs.core.SecurityContext;
 
 import org.a2aproject.sdk.transport.rest.handler.RestHandler;
 
+// JAX-RS @Path annotations cannot be parameterized, so each protocol version requires a separate resource class.
 @Path("/a2a_rest_v1.0")
 public class A2ARestServerResource {
 
@@ -28,6 +29,7 @@ public class A2ARestServerResource {
 
     private A2ARestServerResourceDelegate delegate;
 
+    // Per-request JAX-RS resource — no synchronization needed; each request gets a new instance.
     private A2ARestServerResourceDelegate getDelegate() {
         if (delegate == null) {
             delegate = new A2ARestServerResourceDelegate(restHandler);

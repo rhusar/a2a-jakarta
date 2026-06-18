@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 public class A2ARestVersionRoutingFilter implements ContainerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(A2ARestVersionRoutingFilter.class);
-    private static final String A2A_INTERNAL_PREFIX = "/a2a_";
 
     @Inject
     Instance<A2AVersionProvider> allVersionProviders;
@@ -64,7 +63,7 @@ public class A2ARestVersionRoutingFilter implements ContainerRequestFilter {
         if (path.startsWith("/.well-known/")) {
             return;
         }
-        if (path.startsWith(A2A_INTERNAL_PREFIX)) {
+        if (path.startsWith(InternalPaths.A2A_PREFIX)) {
             return;
         }
 
@@ -94,7 +93,7 @@ public class A2ARestVersionRoutingFilter implements ContainerRequestFilter {
             requestContext.abortWith(
                     Response.status(Response.Status.BAD_REQUEST)
                             .entity("{\"error\":{\"code\":-32001,\"message\":\"Protocol version '"
-                                    + versionHeader + "' is not supported. Supported versions: "
+                                    + InternalPaths.escapeJsonValue(versionHeader) + "' is not supported. Supported versions: "
                                     + versionResolver.supportedVersionsString() + "\"}}")
                             .type(MediaType.APPLICATION_JSON)
                             .build());
