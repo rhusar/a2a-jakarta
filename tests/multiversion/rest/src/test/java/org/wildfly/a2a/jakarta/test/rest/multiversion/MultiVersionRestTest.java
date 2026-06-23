@@ -25,6 +25,7 @@ import org.a2aproject.sdk.integrations.microprofile.MicroProfileConfigProvider;
 import org.a2aproject.sdk.jsonrpc.common.json.JsonUtil;
 import org.a2aproject.sdk.server.PublicAgentCard;
 import org.a2aproject.sdk.server.apps.common.AbstractA2AServerTest;
+import org.a2aproject.sdk.server.apps.common.TestTaskAuthorizationProvider;
 import org.a2aproject.sdk.spec.Event;
 import org.a2aproject.sdk.spec.TransportProtocol;
 import org.a2aproject.sdk.transport.rest.handler.RestHandler;
@@ -133,6 +134,11 @@ public class MultiVersionRestTest extends AbstractA2AServerTest {
         // Remove upstream AgentCardProducer so our MultiVersionAgentCardProducer
         // (which adds /v1 to the transport URL) is used instead
         archive.delete("/WEB-INF/classes/org/a2aproject/sdk/server/apps/common/AgentCardProducer.class");
+        // Remove TestTaskAuthorizationProvider — it uses Quarkus's @IfBuildProperty to
+        // conditionally activate, but WildFly ignores that annotation and always creates
+        // the bean, causing TaskNotFoundError for unauthenticated requests.
+        archive.delete("/WEB-INF/classes/"
+                + TestTaskAuthorizationProvider.class.getName().replace('.', '/') + ".class");
         archive
                 // Add deployment descriptors
                 .addAsManifestResource("META-INF/beans.xml", "beans.xml")
