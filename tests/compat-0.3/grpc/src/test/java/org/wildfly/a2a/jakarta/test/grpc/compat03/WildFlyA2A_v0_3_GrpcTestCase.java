@@ -23,6 +23,7 @@ import org.a2aproject.sdk.compat03.spec.TransportProtocol_v0_3;
 import org.a2aproject.sdk.compat03.transport.grpc.handler.GrpcHandler_v0_3;
 import org.a2aproject.sdk.compat03.transport.jsonrpc.handler.JSONRPCHandler_v0_3;
 import org.a2aproject.sdk.server.apps.common.AbstractA2AServerTest;
+import org.a2aproject.sdk.server.apps.common.TestTaskAuthorizationProvider;
 import org.a2aproject.sdk.grpc.utils.JSONRPCUtils;
 import org.a2aproject.sdk.integrations.microprofile.MicroProfileConfigProvider;
 import org.a2aproject.sdk.jsonrpc.common.json.JsonUtil;
@@ -142,7 +143,7 @@ public class WildFlyA2A_v0_3_GrpcTestCase extends AbstractA2AServerServerTest_v0
         String manifest = "Manifest-Version: 1.0\n" +
                 "Dependencies: io.grpc-all\n";
 
-        return ShrinkWrap.create(WebArchive.class, "ROOT.war")
+        WebArchive archive = ShrinkWrap.create(WebArchive.class, "ROOT.war")
                 .addAsLibraries(libraries)
                 // Extra dependencies needed by the tests
                 .addPackage(AbstractA2AServerTest.class.getPackage())
@@ -153,6 +154,14 @@ public class WildFlyA2A_v0_3_GrpcTestCase extends AbstractA2AServerServerTest_v0
                 .addAsResource("a2a-requesthandler-test.properties")
                 // Add MANIFEST.MF with gRPC module dependencies from WildFly feature pack
                 .setManifest(new StringAsset(manifest));
+
+        // Remove TestTaskAuthorizationProvider — it uses Quarkus's @IfBuildProperty to
+        // conditionally activate, but WildFly ignores that annotation and always creates
+        // the bean, causing TaskNotFoundError for unauthenticated requests.
+        archive.delete("/WEB-INF/classes/"
+                + TestTaskAuthorizationProvider.class.getName().replace('.', '/') + ".class");
+
+        return archive;
     }
 
     static JavaArchive getJarForClass(Class<?> clazz) throws Exception {

@@ -26,6 +26,7 @@ import org.a2aproject.sdk.integrations.microprofile.MicroProfileConfigProvider;
 import org.a2aproject.sdk.jsonrpc.common.json.JsonUtil;
 import org.a2aproject.sdk.server.PublicAgentCard;
 import org.a2aproject.sdk.server.apps.common.AbstractA2AServerTest;
+import org.a2aproject.sdk.server.apps.common.TestTaskAuthorizationProvider;
 import org.a2aproject.sdk.spec.Event;
 import org.a2aproject.sdk.transport.rest.handler.RestHandler;
 import org.a2aproject.sdk.util.Assert;
@@ -132,6 +133,13 @@ public class MultiVersion_v0_3_RestTest extends AbstractA2AServerServerTest_v0_3
                 .addAsWebInfResource("WEB-INF/web.xml", "web.xml")
                 // Add test properties file for AgentCardProducer
                 .addAsResource("a2a-requesthandler-test.properties");
+
+        // Remove TestTaskAuthorizationProvider — it uses Quarkus's @IfBuildProperty to
+        // conditionally activate, but WildFly ignores that annotation and always creates
+        // the bean, causing TaskNotFoundError for unauthenticated requests.
+        archive.delete("/WEB-INF/classes/"
+                + TestTaskAuthorizationProvider.class.getName().replace('.', '/') + ".class");
+
         archive.toString(true);
         return archive;
     }
