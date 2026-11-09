@@ -10,6 +10,7 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +27,8 @@ public class SSESubscriber implements Flow.Subscriber<String> {
     private static volatile Runnable streamingIsSubscribedRunnable;
 
     private Flow.Subscription subscription;
-    private volatile boolean disconnected;
-    private ScheduledFuture<?> heartbeatFuture;
+    private final AtomicBoolean disconnected = new AtomicBoolean();
+    private volatile ScheduledFuture<?> heartbeatFuture;
 
     private final ScheduledExecutorService heartbeatScheduler;
     private final AtomicLong eventId = new AtomicLong(0);
@@ -79,7 +80,7 @@ public class SSESubscriber implements Flow.Subscriber<String> {
 
     @Override
     public void onNext(String item) {
-        if (disconnected) {
+        if (disconnected.get()) {
             LOGGER.info("SSE onNext: ignoring event (already disconnected)");
             return;
         }
@@ -131,10 +132,9 @@ public class SSESubscriber implements Flow.Subscriber<String> {
     }
 
     public void handleClientDisconnect() {
-        if (disconnected) {
+        if (!disconnected.compareAndSet(false, true)) {
             return;
         }
-        disconnected = true;
         stopWriting();
         LOGGER.info("SSE handleClientDisconnect: client disconnected, cancelling subscription on thread={}",
                 Thread.currentThread().getName());
@@ -151,6 +151,9 @@ public class SSESubscriber implements Flow.Subscriber<String> {
      * Cancels the heartbeat and stops all further writes. Once this returns, no write is in
      * progress and none will start, so the writer can be closed safely. Cancelling the heartbeat
      * future alone is not enough, as {@code cancel(false)} does not wait for a running heartbeat.
+     * <p>
+     * If a write is in progress, this blocks until it finishes. A client that stops reading can
+     * therefore delay this until the container's write timeout fails the blocked write.
      */
     private void stopWriting() {
         if (heartbeatFuture != null) {
@@ -162,7 +165,7 @@ public class SSESubscriber implements Flow.Subscriber<String> {
     }
 
     private void heartbeat() {
-        if (disconnected) {
+        if (disconnected.get()) {
             return;
         }
         boolean failed;

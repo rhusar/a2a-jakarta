@@ -18,6 +18,7 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -288,8 +289,8 @@ public class A2AServerResourceDelegate {
 
         publisher.subscribe(new Flow.Subscriber<A2AResponse<?>>() {
             private Flow.Subscription subscription;
-            private volatile boolean disconnected;
-            private ScheduledFuture<?> heartbeatFuture;
+            private final AtomicBoolean disconnected = new AtomicBoolean();
+            private volatile ScheduledFuture<?> heartbeatFuture;
             // Serializes all access to the writer between the EventConsumer thread (onNext) and the
             // heartbeat thread. The servlet container's PrintWriter is not guaranteed to be thread-safe:
             // Undertow's ServletPrintWriterDelegate bypasses PrintWriter's own lock, so unsynchronized
@@ -321,7 +322,7 @@ public class A2AServerResourceDelegate {
 
             @Override
             public void onNext(A2AResponse<?> item) {
-                if (disconnected) {
+                if (disconnected.get()) {
                     LOGGER.debug("SSE onNext: ignoring event (already disconnected)");
                     return;
                 }
@@ -365,33 +366,30 @@ public class A2AServerResourceDelegate {
             public void onComplete() {
                 LOGGER.debug("Custom SSE subscriber onComplete called");
                 stopWriting();
-                synchronized (writeLock) {
-                    try {
-                        writer.close();
-                    } catch (Exception e) {
-                        LOGGER.error("Error closing writer: {}", e.getMessage(), e);
-                    }
+                // stopWriting() has run, so no write is in progress or can start: no lock needed.
+                try {
+                    writer.close();
+                } catch (Exception e) {
+                    LOGGER.error("Error closing writer: {}", e.getMessage(), e);
                 }
                 streamingComplete.complete(null);
             }
 
             private void handleClientDisconnect() {
-                if (disconnected) {
+                if (!disconnected.compareAndSet(false, true)) {
                     return;
                 }
-                disconnected = true;
                 stopWriting();
                 LOGGER.debug("SSE connection closed, calling EventConsumer.cancel() to stop polling loop");
                 if (subscription != null) {
                     subscription.cancel();
                 }
                 context.invokeEventConsumerCancelCallback();
-                synchronized (writeLock) {
-                    try {
-                        writer.close();
-                    } catch (Exception e) {
-                        LOGGER.debug("Error closing writer during disconnect: {}", e.getMessage());
-                    }
+                // stopWriting() has run, so no write is in progress or can start: no lock needed.
+                try {
+                    writer.close();
+                } catch (Exception e) {
+                    LOGGER.debug("Error closing writer during disconnect: {}", e.getMessage());
                 }
             }
 
@@ -399,6 +397,9 @@ public class A2AServerResourceDelegate {
              * Cancels the heartbeat and stops all further writes. Once this returns, no write is in
              * progress and none will start. Cancelling the heartbeat future alone is not enough, as
              * {@code cancel(false)} does not wait for a running heartbeat.
+             * <p>
+             * If a write is in progress, this blocks until it finishes. A client that stops reading can
+             * therefore delay this until the container's write timeout fails the blocked write.
              */
             private void stopWriting() {
                 if (heartbeatFuture != null) {
@@ -410,7 +411,7 @@ public class A2AServerResourceDelegate {
             }
 
             private void heartbeat() {
-                if (disconnected) {
+                if (disconnected.get()) {
                     return;
                 }
                 boolean failed;

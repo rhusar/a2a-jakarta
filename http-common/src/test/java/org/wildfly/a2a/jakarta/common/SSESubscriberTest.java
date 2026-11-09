@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.LockSupport;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,9 @@ class SSESubscriberTest {
         long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(2500);
         while (System.nanoTime() < deadline && !writer.overlapDetected.get()) {
             subscriberRef.get().onNext("{\"kind\":\"status-update\"}");
+            // Pause briefly outside the lock: Java monitors are not fair, so without this the event
+            // thread could keep re-acquiring writeLock and starve the heartbeat thread.
+            LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(100));
         }
         subscriberRef.get().onComplete();
 
